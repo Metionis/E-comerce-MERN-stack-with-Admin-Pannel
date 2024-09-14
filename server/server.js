@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 //create a DB connection -> u can also
 //create a seperate file for this then import/use that file
 
-mongoose.connect(process.env.MONGRO_URI)
+mongoose.connect(process.env.)
   .then(() => console.log('MongoDB: connected'))
   .catch((error) => console.log(error));
 
