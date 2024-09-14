@@ -111,18 +111,33 @@ export const login = async (req, res) => {
 	}
 };
 
+/**
+ * Logs out the user by clearing the access token and the refresh token from the cookies
+ * and deleting the refresh token from Redis.
+ * 
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ * @returns {Promise<void>}
+ */
 export const logout = async (req, res) => {
 	try {
+		// Clear the refresh token from the cookies if it exists
 		const refreshToken = req.cookies.refreshToken;
 		if (refreshToken) {
+			// Verify the refresh token to get the user ID
 			const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+			// Delete the refresh token from Redis
 			await redis.del(`refresh_token:${decoded.userId}`);
 		}
 
+		// Clear the access token and the refresh token from the cookies
 		res.clearCookie("accessToken");
 		res.clearCookie("refreshToken");
+
+		// Return a success message
 		res.json({ message: "Logged out successfully" });
 	} catch (error) {
+		// Log any errors and return 500 status code with error message
 		console.log("Error in logout controller", error.message);
 		res.status(500).json({ message: "Server error", error: error.message });
 	}
