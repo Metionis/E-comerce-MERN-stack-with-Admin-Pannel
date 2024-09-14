@@ -101,6 +101,7 @@ export const login = async (req, res) => {
 				name: user.name,
 				email: user.email,
 				role: user.role,
+        message: "Login successful",
 			});
 		} else {
 			res.status(400).json({ message: "Invalid email or password" });
@@ -125,6 +126,7 @@ export const logout = async (req, res) => {
 		const refreshToken = req.cookies.refreshToken;
 		if (refreshToken) {
 			// Verify the refresh token to get the user ID
+      // Express app must have cookieParser in oder to use cookie
 			const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 			// Delete the refresh token from Redis
 			await redis.del(`refresh_token:${decoded.userId}`);
