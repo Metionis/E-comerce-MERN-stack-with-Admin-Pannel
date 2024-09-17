@@ -5,25 +5,51 @@ import { useCartStore } from "../stores/useCartStore";
 import axios from "../lib/axios";
 import Confetti from "react-confetti";
 
+/**
+ * The purchase success page
+ * @returns {JSX.Element} The purchase success page JSX
+ */
 const PurchaseSuccessPage = () => {
+	/**
+	 * The state of the checkout process
+	 * If true, the checkout process is processing
+	 */
 	const [isProcessing, setIsProcessing] = useState(true);
+
+	/**
+	 * The cart store
+	 * Used to clear the cart
+	 */
 	const { clearCart } = useCartStore();
+
+	/**
+	 * The error message
+	 * If an error occurs, it will be stored in this state
+	 */
 	const [error, setError] = useState(null);
 
-	useEffect(() => {
-		const handleCheckoutSuccess = async (sessionId) => {
-			try {
-				await axios.post("/payments/checkout-success", {
-					sessionId,
-				});
-				clearCart();
-			} catch (error) {
-				console.log(error);
-			} finally {
-				setIsProcessing(false);
-			}
-		};
+	/**
+	 * Handle the checkout success
+	 * @param {string} sessionId The session ID
+	 */
+	const handleCheckoutSuccess = async (sessionId) => {
+		try {
+			await axios.post("/payments/checkout-success", {
+				sessionId,
+			});
+			clearCart();
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setIsProcessing(false);
+		}
+	};
 
+	/**
+	 * Get the session ID from the URL
+	 * If no session ID is found, set the error state
+	 */
+	useEffect(() => {
 		const sessionId = new URLSearchParams(window.location.search).get("session_id");
 		if (sessionId) {
 			handleCheckoutSuccess(sessionId);
@@ -33,6 +59,9 @@ const PurchaseSuccessPage = () => {
 		}
 	}, [clearCart]);
 
+	/**
+	 * Display the correct JSX based on the state
+	 */
 	if (isProcessing) return "Processing...";
 
 	if (error) return `Error: ${error}`;
